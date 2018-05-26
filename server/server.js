@@ -76,6 +76,21 @@ app.get('/api/users', (req,res)=>{
     res.send(doc);
   });
 });
+
+app.get('/api/user/posts', (req,res)=>{
+  let limit = parseInt(req.query.limit || 5);
+  let order = req.query.order || 'desc';
+  let userID = req.query.user;
+
+  Book.find({ownerID:userID}).sort({
+    _id: order
+    }).limit(limit).exec((err, doc) => {
+    if (err) {
+      return res.status(400).json({message: err.message});
+    }
+    res.send(doc);
+  });
+});
 // Books
 app.get('/api/book', (req,res)=>{
   let id = req.query.id;
