@@ -59,6 +59,23 @@ app.post('/api/login', (req,res)=>{
   });
 });
 
+app.get('/api/users', (req,res)=>{
+  let skip = parseInt(req.query.skip || '');
+  let limit = parseInt(req.query.limit || 5);
+  let order = req.query.order || 'desc';
+  let userID = req.query.id;
+
+  let query = userID ? {_id:userID} : {};
+
+  User.find(query).skip(skip).sort({
+    _id: order
+    }).limit(limit).exec((err, doc) => {
+    if (err) {
+      return res.status(400).json({message: err.message});
+    }
+    res.send(doc);
+  });
+});
 // Books
 app.get('/api/book', (req,res)=>{
   let id = req.query.id;
