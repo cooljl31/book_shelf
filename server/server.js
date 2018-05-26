@@ -126,6 +126,22 @@ app.get('/api/book', (req,res)=>{
   });
 });
 
+app.get('/api/reviewer', (req,res)=>{
+  let id = req.query.id;
+
+  User.findById(id, (err,doc)=>{
+    if (err) {
+      return res.status(400).json({
+        message: `This ${err.value} id does not exist`
+      });
+    }
+    res.json({
+      name: doc.name,
+      lastname: doc.lastname
+    });
+  });
+});
+
 app.get('/api/books', (req,res)=>{
   let skip = parseInt(req.query.skip || '');
   let limit = parseInt(req.query.limit || 5);
