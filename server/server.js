@@ -100,6 +100,18 @@ app.get('/api/user/logout', auth, (req,res)=>{
     res.send(200);
   });
 });
+
+app.get('/api/auth',auth,(req,res)=>{
+
+  res.json({
+    isAuth:true,
+    id:req.user._id,
+    email:req.user.email,
+    name:req.user.name,
+    lastname:req.user.lastname
+  });
+});
+
 // Books
 app.get('/api/book', (req,res)=>{
   let id = req.query.id;
