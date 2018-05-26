@@ -20,9 +20,10 @@ app.post('/api/register', (req,res)=>{
 
   user.save((err,doc)=>{
     if (err) {
-      return res.status(400).json({message: err.message});
+      return res.status(400).json({
+        message: `This ${user.email} email is already taken`
+      });
     }
-
     res.status(200).json({
       post:true,
       userID:doc._id
