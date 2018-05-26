@@ -44,6 +44,22 @@ UserSchema.methods.generateToken = (user,cb) =>{
     cb(null, user);
   });
 };
+
+UserSchema.statics.findByToken = function(token,cb) {
+  var user = this;
+  jwt.verify(token, config.SECRET, (err, decode) => {
+
+    user.findOne({
+      '_id': decode,
+      'token': token
+    }, (err, user) => {
+      if (err) {
+        return cb(err);
+      }
+      cb(null, user);
+    });
+  });
+};
 UserSchema.plugin(bcrypt);
 UserSchema.plugin(timestamps);
 UserSchema.plugin(mongooseStringQuery);
