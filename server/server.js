@@ -113,18 +113,6 @@ app.get('/api/auth',auth,(req,res)=>{
 });
 
 // Books
-app.get('/api/book', (req,res)=>{
-  let id = req.query.id;
-
-  Book.findById(id, (err,doc)=>{
-    if (err) {
-      return res.status(400).json({
-        message: err.message
-      });
-    }
-    res.send(doc);
-  });
-});
 
 app.get('/api/reviewer', (req,res)=>{
   let id = req.query.id;
@@ -146,8 +134,11 @@ app.get('/api/books', (req,res)=>{
   let skip = parseInt(req.query.skip || '');
   let limit = parseInt(req.query.limit || 5);
   let order = req.query.order || 'desc';
+  let bookID = req.query.id;
 
-  Book.find().skip(skip).sort({
+  let query = bookID ? {_id:bookID} : {};
+
+  Book.find(query).skip(skip).sort({
     _id: order
     }).limit(limit).exec((err, doc) => {
     if (err) {
