@@ -91,6 +91,15 @@ app.get('/api/user/posts', (req,res)=>{
     res.send(doc);
   });
 });
+
+app.get('/api/user/logout', auth, (req,res)=>{
+  req.user.deleteToken(req.token, (err)=>{
+    if (err) {
+      return res.status(400).json({message: err.message});
+    }
+    res.send(200);
+  });
+});
 // Books
 app.get('/api/book', (req,res)=>{
   let id = req.query.id;
