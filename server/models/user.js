@@ -3,6 +3,7 @@ import bcrypt from 'mongoose-bcrypt';
 import timestamps from 'mongoose-timestamp';
 import jwt from 'jsonwebtoken';
 import mongooseStringQuery from 'mongoose-string-query';
+const config = require('../config/config').get(process.env.NODE_ENV);
 
 const UserSchema = new Schema({
   email: {
@@ -14,6 +15,7 @@ const UserSchema = new Schema({
   password:{
     type:String,
     required:true,
+    bcrypt: true,
     minlength:6
   },
   name:{
@@ -60,6 +62,17 @@ UserSchema.statics.findByToken = function(token,cb) {
     });
   });
 };
+
+UserSchema.methods.deleteToken = function(token,cb) {
+  var user = this;
+  user.update({$unset:{token:1}}, (err,user)=> {
+    if (err) {
+      return cb(err);
+    }
+    cb(null, user);
+  });
+};
+
 UserSchema.plugin(bcrypt);
 UserSchema.plugin(timestamps);
 UserSchema.plugin(mongooseStringQuery);
