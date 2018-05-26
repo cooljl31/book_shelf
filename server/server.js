@@ -73,9 +73,9 @@ app.get('/api/book', (req,res)=>{
 });
 
 app.get('/api/books', (req,res)=>{
-  let skip = parseInt(req.query.skip);
-  let limit = parseInt(req.query.limit);
-  let order = req.query.order;
+  let skip = parseInt(req.query.skip || '');
+  let limit = parseInt(req.query.limit || 5);
+  let order = req.query.order || 'desc';
 
   Book.find().skip(skip).sort({
     _id: order
@@ -102,7 +102,7 @@ app.post('/api/book', (req,res)=>{
   });
 });
 
-app.post('/api/book', (req,res)=>{
+app.put('/api/book', (req,res)=>{
   Book.findByIdAndUpdate(req.body._id, req.body, {
       new: true
     }, (err, doc)=>{
