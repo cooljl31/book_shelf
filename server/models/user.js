@@ -33,6 +33,17 @@ const UserSchema = new Schema({
   }
 });
 
+UserSchema.methods.generateToken = (user,cb) =>{
+  var token = jwt.sign(user._id.toHexString(), config.SECRET);
+
+  user.token = token;
+  user.save((err, user) => {
+    if (err) {
+      return cb(err);
+    }
+    cb(null, user);
+  });
+};
 UserSchema.plugin(bcrypt);
 UserSchema.plugin(timestamps);
 UserSchema.plugin(mongooseStringQuery);
