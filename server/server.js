@@ -10,17 +10,64 @@ const config = require('./config/config').get(process.env.NODE_ENV);
 mongoose.connect(config.DATABASE);
 import {User} from './models/user';
 import {Book} from './models/book';
-
+import {auth} from './middleware/auth';
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+// User
+app.post('/api/register', (req,res)=>{
+  const user = new User(req.body);
+
+  user.save((err,doc)=>{
+    if (err) {
+      return res.status(400).json({message: err.message});
+    }
+
+    res.status(200).json({
+      post:true,
+      userID:doc._id
+    });
+  });
+});
+
+app.post('/api/login', (req,res)=>{
+
+  User.findOne({'email':req.body.email}, (err, user)=>{
+    if (!user) {
+      res.json({
+        message: 'Auth failed, user not found'
+      });
+    }
+
+    user.verifyPassword(req.body.password, (err,isMatch)=>{
+      if (err) {
+        throw err;
+      }
+      if (!isMatch) {
+        return res.status(400).json({
+          message: 'Wrong password'
+        });
+      }
+      user.generateToken(user,(err,user)=>{
+        if (err) {
+          return res.status(400).json({message:err});
+        }
+        res.cookie('auth',user.token).json({message:'Ok'});
+      });
+    });
+  });
+});
+
+// Books
 app.get('/api/book', (req,res)=>{
   let id = req.query.id;
 
   Book.findById(id, (err,doc)=>{
     if (err) {
-return res.status(400).send(err.message);
-}
+      return res.status(400).json({
+        message: err.message
+      });
+    }
     res.send(doc);
   });
 });
@@ -34,7 +81,7 @@ app.get('/api/books', (req,res)=>{
     _id: order
     }).limit(limit).exec((err, doc) => {
     if (err) {
-      return res.status(400).send(err.message);
+      return res.status(400).json({message: err.message});
     }
     res.send(doc);
   });
@@ -45,7 +92,7 @@ app.post('/api/book', (req,res)=>{
 
   book.save((err,doc)=>{
     if (err) {
-      return res.status(400).send(err.message);
+      return res.status(400).json({message:err.message});
     }
 
     res.status(200).json({
@@ -60,7 +107,7 @@ app.post('/api/book', (req,res)=>{
       new: true
     }, (err, doc)=>{
     if (err) {
-      return res.status(400).send(err.message);
+      return res.status(400).json({message: err.message});
     }
     res.json({
       success: true,
@@ -71,11 +118,10 @@ app.post('/api/book', (req,res)=>{
 
 
 app.delete('/api/book', (req,res)=>{
-
   let id = req.query.id;
-  Book.findByIdAndRemove(id, (err, doc)=>{
+  Book.findByIdAndRemove(id, (err)=>{
     if (err) {
-      return res.status(400).send(err.message);
+      return res.status(400).json({message: err.message});
     }
     res.json({
       success: true
