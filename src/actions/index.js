@@ -148,3 +148,33 @@ export const loginUser = ({email,password}) => {
   };
  };
 
+ export const getUsers = (userID) => {
+  const request = Axios.get('/api/users')
+                            .then((response) => response.data);
+
+  return {
+    type: 'GET_USERS',
+    payload: request
+  };
+ };
+
+
+ export const getUserRegister = (user,userList) => {
+  const request = Axios.post('/api/register', user);
+
+    return (dispatch) => {
+      request.then(({data}) => {
+        let users = data.success ? [...userList,data.doc] : userList;
+        let response = {
+          data: data,
+          users
+        };
+
+        dispatch({
+          type: 'USER_REGISTER',
+          payload: response
+        });
+
+      });
+    };
+ };
