@@ -235,7 +235,7 @@ if (process.env.NODE_ENV === 'production') {
   const path = require('path');
 
   app.get('/*', (req,res)=> {
-    res.sendfile(path.resolve(__dirname,'../build','index.html'));
+    res.sendFile(path.resolve(__dirname,'../build','index.html'));
   });
 }
 const port = process.env.PORT || 3001;
