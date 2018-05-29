@@ -13,7 +13,7 @@ import {Book} from './models/book';
 import {auth} from './middleware/auth';
 app.use(bodyParser.json());
 app.use(cookieParser());
-
+app.use(express.static('build'));
 // User
 app.post('/api/register', (req,res)=>{
   const user = new User(req.body);
@@ -231,7 +231,13 @@ app.delete('/api/book', (req,res)=>{
   });
 });
 
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path');
 
+  app.get('/*', (req,res)=> {
+    res.sendfile(path.resolve(__dirname,'../build','index.html'));
+  });
+}
 const port = process.env.PORT || 3001;
 app.listen(port, ()=> {
   console.log(`Server start at ${port}`);
