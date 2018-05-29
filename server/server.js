@@ -36,7 +36,12 @@ app.post('/api/register', (req,res)=>{
           success:false,
           message: `This ${user.email} email is already taken`
         });
-      } else if (err.errors.password.value !== 6) {
+      } else if (err.errors.email ? err.errors.email.path === 'email' : false) {
+        return res.json({
+          success:false,
+          message: 'emails is required'
+        });
+      } else if (err.errors.password ? err.errors.password.value !== 6 : false) {
         return res.json({
           success:false,
           message: 'password is shorter than the minimum allowed length (6)'
