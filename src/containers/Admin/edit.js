@@ -1,8 +1,12 @@
-/*eslint no-console: ['error', { allow: ['warn','log'] }] */
 import React, {PureComponent} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {getBook, updateBook, deleteBook} from '../../actions/index';
+import {
+  getBook,
+  updateBook,
+  deleteBook,
+  clearDeleteBook
+} from '../../actions/index';
 import {Link} from 'react-router-dom';
 
 class EditBook extends PureComponent {
@@ -40,9 +44,12 @@ class EditBook extends PureComponent {
     this.props.dispatch(getBook(this.props.match.params.id));
   }
 
+  componentWillUnmount() {
+    this.props.dispatch(clearDeleteBook());
+  }
+
   componentWillReceiveProps(nextProps){
     let book = nextProps.books.book;
-    console.log(book);
 
     this.setState({
       formData: {

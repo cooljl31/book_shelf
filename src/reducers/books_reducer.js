@@ -8,6 +8,12 @@ export default (state={},action) =>  {
         return {...state,newBook:action.payload};
     case 'CLEAR_NEWBOOK':
         return {...state,newBook:action.payload};
+    case 'CLEAR_DELETEBOOK':
+        return {...state,
+                book:action.payload.book,
+                updateBook:action.payload.updateBook,
+                postDeleted:action.payload.postDelete
+            };
     case 'UPDATE_BOOK':
         return {
             ...state,

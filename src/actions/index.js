@@ -108,6 +108,16 @@ export const addBook = (book) => {
   };
  };
 
+ export const clearDeleteBook = () => ({
+  type: 'CLEAR_DELETEBOOK',
+  payload: {
+    book: {},
+    updateBook:false,
+    postDelete:false
+  }
+}
+);
+
 /* USER */
 
 export const loginUser = ({email,password}) => {
