@@ -8,7 +8,7 @@ class Header extends Component {
     showNav:false
   }
 
-  onHieNav(){
+  onHideNav(){
     this.setState({showNav:false});
   }
   render() {
@@ -26,7 +26,7 @@ class Header extends Component {
         </div>
         <Nav
           showNav={this.state.showNav}
-          onHieNav={()=>this.onHieNav()}
+          onHideNav={()=>this.onHideNav()}
         >
         </Nav>
         <Link to="/" className="logo">

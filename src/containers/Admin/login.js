@@ -1,6 +1,4 @@
 
-/*eslint no-console: ['error', { allow: ['warn','log'] }] */
-
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {loginUser} from '../../actions/index';
