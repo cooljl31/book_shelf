@@ -8,7 +8,10 @@ let auth = (req,res,next) =>  {
       return res.status(400).json({message: err.message});
     }
     if (!user) {
-      return res.status(401).json({message: 'You\'re not login'});
+      return res.json({
+        isAuth:false,
+        message: 'You\'re not login'
+      });
     }
     req.token = token;
     req.user = user;

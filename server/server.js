@@ -35,17 +35,16 @@ app.post('/api/login', (req,res)=>{
 
   User.findOne({'email':req.body.email}, (err, user)=>{
     if (!user) {
-      res.json({
+      return res.json({
+        isAuth:false,
         message: 'Auth failed, user not found'
       });
     }
 
     user.verifyPassword(req.body.password, (err,isMatch)=>{
-      if (err) {
-        throw err;
-      }
       if (!isMatch) {
-        return res.status(400).json({
+        return res.json({
+          isAuth:false,
           message: 'Wrong password'
         });
       }
@@ -53,7 +52,11 @@ app.post('/api/login', (req,res)=>{
         if (err) {
           return res.status(400).json({message:err});
         }
-        res.cookie('auth',user.token).json({message:'Ok'});
+        res.cookie('auth',user.token).json({
+          isAuth:true,
+          id:user._id,
+          email:user.email
+        });
       });
     });
   });
@@ -80,7 +83,7 @@ app.get('/api/users', (req,res)=>{
 app.get('/api/user/posts', (req,res)=>{
   let limit = parseInt(req.query.limit || 5);
   let order = req.query.order || 'desc';
-  let userID = req.query.user;
+  let userID = req.query.id;
 
   Book.find({ownerID:userID}).sort({
     _id: order
@@ -118,9 +121,11 @@ app.get('/api/reviewer', (req,res)=>{
   let id = req.query.id;
 
   User.findById(id, (err,doc)=>{
+
+
     if (err) {
       return res.status(400).json({
-        message: `This ${err.value} id does not exist`
+        message: `This ${doc._id} id does not exist`
       });
     }
     res.json({
@@ -140,11 +145,12 @@ app.get('/api/books', (req,res)=>{
 
   Book.find(query).skip(skip).sort({
     _id: order
-    }).limit(limit).exec((err, doc) => {
+  }).limit(limit).exec((err, doc) => {
     if (err) {
       return res.status(400).json({message: err.message});
     }
-    res.send(doc);
+
+    res.json(doc);
   });
 });
 
@@ -164,9 +170,10 @@ app.post('/api/book', (req,res)=>{
 });
 
 app.put('/api/book', (req,res)=>{
+  console.log(req.body._id);
   Book.findByIdAndUpdate(req.body._id, req.body, {
       new: true
-    }, (err, doc)=>{
+    }, (err, doc) => {
     if (err) {
       return res.status(400).json({message: err.message});
     }
