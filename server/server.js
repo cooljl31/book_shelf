@@ -19,14 +19,49 @@ app.post('/api/register', (req,res)=>{
   const user = new User(req.body);
 
   user.save((err,doc)=>{
-    if (err) {
-      return res.status(400).json({
-        message: `This ${user.email} email is already taken`
-      });
+
+    if (user.email !== '') {
+      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if (!re.test(user.email)) {
+        return res.json({
+          success:false,
+          message: 'This is not an email try agains'
+        });
+      }
     }
+
+    if (err) {
+      if (err.name === 'MongoError') {
+        return res.json({
+          success:false,
+          message: `This ${user.email} email is already taken`
+        });
+      } else if (err.errors.password.value !== 6) {
+        return res.json({
+          success:false,
+          message: 'password is shorter than the minimum allowed length (6)'
+        });
+      } else {
+        return null;
+      }
+    }
+
     res.status(200).json({
-      post:true,
-      userID:doc._id
+      success:true,
+      doc
+    });
+
+  });
+});
+
+app.delete('/api/user', (req,res)=>{
+  let id = req.query.id;
+  User.findByIdAndRemove(id, (err)=>{
+    if (err) {
+      return res.status(400).json({message: err.message});
+    }
+    res.json({
+      success: true
     });
   });
 });
@@ -136,7 +171,7 @@ app.get('/api/reviewer', (req,res)=>{
 });
 
 app.get('/api/books', (req,res)=>{
-  let skip = parseInt(req.query.skip || '');
+  let skip = parseInt(req.query.start || '');
   let limit = parseInt(req.query.limit || 5);
   let order = req.query.order || 'desc';
   let bookID = req.query.id;
@@ -170,7 +205,6 @@ app.post('/api/book', (req,res)=>{
 });
 
 app.put('/api/book', (req,res)=>{
-  console.log(req.body._id);
   Book.findByIdAndUpdate(req.body._id, req.body, {
       new: true
     }, (err, doc) => {
